@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+mysql-connector-python
+python-dotenv
+feedparser
+feedgen
+pydub
+requests
+passlib[bcrypt]
+python-jose[cryptography]
+apscheduler
+gunicorn
+pydantic-settings
+python-multipart
