@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const showRegisterLink = document.getElementById("show-register-link");
     const showLoginLink = document.getElementById("show-login-link");
     const logoutBtn = document.getElementById("logout-btn");
+    const themeSwitcher = document.getElementById("theme-switcher");
 
     const searchForm = document.getElementById("search-form");
     const searchResults = document.getElementById("search-results");
@@ -28,12 +29,33 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentPodcastId = null;
     let currentEpisodeAudioUrl = null;
     let currentMarkers = []; // Stores marker times in seconds
+    let currentTheme = localStorage.getItem("theme") || "light";
+
+    // Apply initial theme
+    applyTheme();
 
     if (token) {
         authSection.classList.add("d-none");
         appSection.classList.remove("d-none");
         fetchMySubscriptions(); // Fetch subscriptions if already logged in
     }
+
+    //
+    // Theme Switcher
+    //
+    function applyTheme() {
+        if (currentTheme === "dark") {
+            document.body.classList.add("dark-mode");
+        } else {
+            document.body.classList.remove("dark-mode");
+        }
+    }
+
+    themeSwitcher.addEventListener("click", () => {
+        currentTheme = currentTheme === "light" ? "dark" : "light";
+        localStorage.setItem("theme", currentTheme);
+        applyTheme();
+    });
 
     //
     // Authentication UI Toggling
