@@ -19,14 +19,13 @@ def register_user(
     """
     Create new user.
     """
-    db_gen = next(db)
-    user = crud_user.get_user_by_username(db=db_gen, username=user_in.username)
+    user = crud_user.get_user_by_username(db=db, username=user_in.username)
     if user:
         raise HTTPException(
             status_code=400,
             detail="The user with this username already exists in the system.",
         )
-    user = crud_user.create_user(db=db_gen, user=user_in)
+    user = crud_user.create_user(db=db, user=user_in)
     return user
 
 @router.post("/login/access-token", response_model=user.Token)
@@ -37,8 +36,7 @@ def login_for_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    db_gen = next(db)
-    user = crud_user.get_user_by_username(db_gen, username=form_data.username)
+    user = crud_user.get_user_by_username(db, username=form_data.username)
     if not user or not security.verify_password(form_data.password, user['hashed_password']):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

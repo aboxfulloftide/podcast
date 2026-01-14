@@ -11,13 +11,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/login/access-token"
 
 def get_db():
     """Get a database connection from the pool."""
-    db_conn = None
-    try:
-        db_conn = next(get_db_connection())
-        yield db_conn
-    finally:
-        if db_conn:
-            db_conn.close()
+    yield from get_db_connection()
 
 async def get_current_user(
     db: MySQLConnection = Depends(get_db), token: str = Depends(oauth2_scheme)

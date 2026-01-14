@@ -1,8 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
     const authSection = document.getElementById("auth-section");
     const appSection = document.getElementById("app-section");
-    const loginForm = document.getElementById("login-form");
-    const registerForm = document.getElementById("register-form");
+    const loginForm = document.getElementById("login-form"); // Added this line
+    const registerForm = document.getElementById("register-form"); // Added this line
+    const loginContainer = document.getElementById("login-container");
+    const registerContainer = document.getElementById("register-container");
+    const showRegisterLink = document.getElementById("show-register-link");
+    const showLoginLink = document.getElementById("show-login-link");
+    const logoutBtn = document.getElementById("logout-btn");
+
     const searchForm = document.getElementById("search-form");
     const searchResults = document.getElementById("search-results");
     const mySubscriptionsSection = document.getElementById("my-subscriptions");
@@ -30,7 +36,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     //
-    // Authentication
+    // Authentication UI Toggling
+    //
+    showRegisterLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        loginContainer.classList.add("d-none");
+        registerContainer.classList.remove("d-none");
+    });
+
+    showLoginLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        registerContainer.classList.add("d-none");
+        loginContainer.classList.remove("d-none");
+    });
+
+    logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("accessToken");
+        location.reload();
+    });
+
+    //
+    // Authentication API Calls
     //
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -48,7 +74,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: formData,
             });
 
-            if (!response.ok) throw new Error("Login failed");
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error("Login failed. Please check your username and password, or register if you don't have an account.");
+                }
+                throw new Error("Login failed");
+            }
 
             const data = await response.json();
             token = data.access_token;
@@ -74,9 +105,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ username, password }),
             });
 
-            if (!response.ok) throw new Error("Registration failed");
+            if (!response.ok) {
+                let errorMessage = "Registration failed";
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.detail || errorMessage;
+                } catch (e) {
+                    errorMessage = await response.text();
+                }
+                throw new Error(errorMessage);
+            }
             alert("Registration successful! Please login.");
             registerForm.reset();
+            // Show login form after successful registration
+            registerContainer.classList.add("d-none");
+            loginContainer.classList.remove("d-none");
 
         } catch (error) {
             console.error(error);
