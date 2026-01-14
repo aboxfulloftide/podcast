@@ -21,8 +21,11 @@ def search_podcasts_api(
     try:
         results = podcast_index.search_podcasts(query)
         
-        # Data cleaning: Ensure feeds have a valid image URL
-        cleaned_feeds = [feed for feed in results.get("feeds", []) if feed.get("image")]
+        # Data cleaning: Ensure feeds have a valid, non-empty image URL
+        cleaned_feeds = [
+            feed for feed in results.get("feeds", []) 
+            if isinstance(feed.get("image"), str) and feed.get("image").strip()
+        ]
         results["feeds"] = cleaned_feeds
         results["count"] = len(cleaned_feeds)
 
