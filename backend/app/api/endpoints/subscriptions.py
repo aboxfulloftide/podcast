@@ -20,16 +20,14 @@ def subscribe_to_podcast(
     """
     Subscribe to a podcast.
     """
-    db_gen = next(db) # Get the actual connection object from the generator
-    
     # Check if podcast already exists in our database
-    podcast = crud_podcast.get_podcast_by_feed_url(db_gen, feed_url=podcast_feed_url)
+    podcast = crud_podcast.get_podcast_by_feed_url(db, feed_url=podcast_feed_url)
     if not podcast:
-        podcast = crud_podcast.create_podcast(db_gen, title=podcast_title, feed_url=podcast_feed_url, image_url=podcast_image_url)
+        podcast = crud_podcast.create_podcast(db, title=podcast_title, feed_url=podcast_feed_url, image_url=podcast_image_url)
 
     # Check if user is already subscribed to this podcast
     existing_subscription = crud_subscription.get_subscription_by_user_and_podcast(
-        db_gen, user_id=current_user['id'], podcast_id=podcast['id']
+        db, user_id=current_user['id'], podcast_id=podcast['id']
     )
     if existing_subscription:
         raise HTTPException(
@@ -46,7 +44,7 @@ def subscribe_to_podcast(
         image_url=podcast_image_url
     )
     subscription = crud_subscription.create_subscription(
-        db_gen, subscription=subscription_in, user_id=current_user['id'], podcast_id=podcast['id']
+        db, subscription=subscription_in, user_id=current_user['id'], podcast_id=podcast['id']
     )
     return subscription
 
@@ -58,6 +56,5 @@ def read_my_subscriptions(
     """
     Retrieve all subscriptions for the current user.
     """
-    db_gen = next(db)
-    subscriptions = crud_subscription.get_subscriptions_by_user_id(db_gen, user_id=current_user['id'])
+    subscriptions = crud_subscription.get_subscriptions_by_user_id(db, user_id=current_user['id'])
     return subscriptions

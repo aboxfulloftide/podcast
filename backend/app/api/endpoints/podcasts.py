@@ -42,8 +42,7 @@ def get_podcast_episodes(
     """
     Retrieve episodes for a given podcast from its RSS feed.
     """
-    db_gen = next(db)
-    podcast_db = crud_podcast.get_podcast_by_id(db_gen, podcast_id)
+    podcast_db = crud_podcast.get_podcast_by_id(db, podcast_id)
     if not podcast_db:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Podcast not found")
 
